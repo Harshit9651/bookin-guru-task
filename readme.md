@@ -3,15 +3,17 @@
 This API returns the most polluted cities from selected European countries, cleaned and sorted, with optional Wikipedia descriptions.
 
 
-## 🛠 How to Run Locally
+## How to Run Locally
 
 1. **Clone or download the repo**
 git clone https://github.com/Harshit9651/bookin-guru-task.git
 
-2. **install dependencis**
+2. **install dependencis:**
 npm i 
-3. **run the code**
+3. **run the code:**
 npm run dev
+3. **then explore the api:**
+http://localhost:3000/api/v1/cities?page=1&limit=5
 
 ##  Approach
 
