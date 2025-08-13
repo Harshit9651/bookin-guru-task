@@ -1,31 +1,35 @@
-
 const axios = require('axios');
 
 const cache = new Map();
-const CACHE_TTL = 1000 * 60 * 60 * 24;
+const CACHE_TTL = 1000 * 60 * 60 * 24; // 24 hours
 
 function cacheKey(title) {
   return title.toLowerCase().trim();
 }
 
+function cleanTitle(title) {
+  return title.replace(/\(.*?\)/g, '').trim();
+}
+
 async function fetchWikiSummary(title) {
   const url = `https://en.wikipedia.org/api/rest_v1/page/summary/${encodeURIComponent(title)}`;
   const r = await axios.get(url, { timeout: 8000 });
-  const data = r.data;
-  if (data && data.extract) return data.extract;
+  if (r.data && r.data.extract) return r.data.extract;
   return null;
 }
 
 async function getSummaryForCity(cityName, countryName) {
   if (!cityName) return null;
+
+  const cleanCity = cleanTitle(cityName);
   const attempts = [];
-  if (countryName) attempts.push(`${cityName}, ${countryName}`);
-  attempts.push(cityName);
+  if (countryName) attempts.push(`${cleanCity}, ${countryName}`);
+  attempts.push(cleanCity);
 
   for (const attempt of attempts) {
     const key = cacheKey(attempt);
     const cached = cache.get(key);
-    if (cached && (Date.now() < cached.expiresAt)) return cached.value;
+    if (cached && Date.now() < cached.expiresAt) return cached.value;
 
     try {
       const summary = await fetchWikiSummary(attempt);
@@ -39,7 +43,8 @@ async function getSummaryForCity(cityName, countryName) {
       }
     }
   }
-  return null;
+
+  return null; 
 }
 
 module.exports = { getSummaryForCity };

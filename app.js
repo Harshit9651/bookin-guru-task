@@ -1,13 +1,12 @@
-
-
-
-
 require('dotenv').config();
 const express = require('express')
 const app = express();
 const cookieParser = require('cookie-parser');
 const rateLimit = require('express-rate-limit');
+const axios = require('axios');
+
 app.use(express.urlencoded({ extended: true }));
+
 
 
 const router = require('./routes');
@@ -42,3 +41,13 @@ const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`Server listening on port ${PORT}`);
 });
+
+
+
+if (process.env.RENDER_EXTERNAL_URL) {
+  setInterval(() => {
+    axios.get(process.env.RENDER_EXTERNAL_URL)
+      .then(() => console.log("Keep-alive ping sent"))
+      .catch(err => console.error("Ping failed:", err.message));
+  }, 14 * 60 * 1000); 
+}
